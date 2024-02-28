@@ -74,7 +74,7 @@ podman login -u rh_ee_lfalero quay.io
 ```
 
 ```shell script
-podman push code-with-quarkus:1.0.0 quay.io/rh_ee_lfalero/code-with-quarkus:1.0.0
+podman push quay.io/rh_ee_lfalero/code-with-quarkus:1.0.0
 ```
 
 ```yaml
