@@ -83,6 +83,8 @@ kind: Deployment
 metadata:
   name: code-with-quarkus
   namespace: redhat-test
+  labels:
+    app: code-with-quarkus
 spec:
   replicas: 1
   selector:
@@ -100,8 +102,22 @@ spec:
             - containerPort: 8080
 ```
 
-```shell script
-oc expose deployment code-with-quarkus --port 8080
+```yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: code-with-quarkus
+  namespace: redhat-test
+  labels:
+    app: code-with-quarkus
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: code-with-quarkus
 ```
 
 ```shell script
