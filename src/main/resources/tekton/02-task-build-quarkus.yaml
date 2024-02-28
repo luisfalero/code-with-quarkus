@@ -1,0 +1,90 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-quarkus
+spec:
+  params:
+    - name: appName
+      type: string
+    - name: mavenOpts
+      #default: "-Dquarkus.container-image.build=true -Dquarkus.container-image.push=true"
+      type: string
+  steps:
+    - name: build-quarkus-image
+      image: registry.access.redhat.com/ubi8/ubi-minimal
+      command: ["/bin/sh"]
+      args:
+        - -c
+        - |      
+
+          VERSION=$(grep -oP '<version>\K[^<]+' pom.xml | head -n 1)
+          
+          echo "-----------------------------------------------------------"
+
+          microdnf install -y podman
+          podman --version
+
+          echo "-----------------------------------------------------------"
+
+          mkdir -p ~/.config/containers
+          echo -e "[rootless]\n  uid_map = 0:$(id -u):1\n  gid_map = 0:$(id -g):1" > ~/.config/containers/containers.conf
+
+          echo "-----------------------------------------------------------"
+          
+          microdnf install -y java-17-openjdk-devel
+          java --version       
+
+          echo "-----------------------------------------------------------"
+
+          mkdir -p /usr/share/maven
+          curl -fsSL -o /tmp/apache-maven-3.9.1-bin.tar.gz https://archive.apache.org/dist/maven/maven-3/3.9.1/binaries/apache-maven-3.9.1-bin.tar.gz
+          tar -xf /tmp/apache-maven-3.9.1-bin.tar.gz -C /usr/share/maven --strip-components=1
+          ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+          mvn --version
+
+          echo "-----------------------------------------------------------"
+
+          #mvn package -Dnative $(inputs.params.mavenOpts)
+          mvn package
+
+          mkdir -p /deployments
+          #cp target/*-runner.jar /deployments/$(inputs.params.appName).jar
+          cp target/$(inputs.params.appName)-$VERSION.jar /deployments/$(inputs.params.appName)-$VERSION.jar
+          ls -l /deployments
+      securityContext:
+        runAsUser: 0
+      workingDir: $(workspaces.shared-workspace.path)
+      # env:
+      #  - name: MAVEN_OPTS
+      #    value: "$(inputs.params.mavenOpts)"
+    
+    #- name: build-quarkus-image
+    #  image: maven:3.8.4-openjdk-17
+    #  command: ["mvn"]
+    #  args: ["package", "-Dnative", "$(inputs.params.mavenOpts)"]
+    #  workingDir: $(workspaces.shared-workspace.path)
+    #  env:
+    #    - name: MAVEN_OPTS
+    #      value: "$(inputs.params.mavenOpts)"
+
+    - name: create-image
+      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+      command: ["oc"]
+      args:
+        - "new-build"
+        - "--name=$(inputs.params.appName)"
+        - "--binary=true"
+        - "openshift/ubi8-openjdk-17:1.12"
+      workingDir: $(workspaces.shared-workspace.path)
+
+    - name: start-build
+      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+      command: ["oc"]
+      args:
+        - "start-build"
+        - "--from-dir=."
+        - "$(inputs.params.appName)"
+      workingDir: $(workspaces.shared-workspace.path)
+
+  workspaces:
+    - name: shared-workspace

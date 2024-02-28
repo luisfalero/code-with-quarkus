@@ -97,7 +97,8 @@ spec:
     spec:
       containers:
         - name: code-with-quarkus
-          image: quay.io/rh_ee_lfalero/code-with-quarkus:1.0.0
+          #image: quay.io/rh_ee_lfalero/code-with-quarkus:1.0.0
+          image: image-registry.openshift-image-registry.svc:5000/redhat-test/code-with-quarkus:latest
           ports:
             - containerPort: 8080
 ```
