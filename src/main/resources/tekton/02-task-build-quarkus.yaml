@@ -56,6 +56,13 @@ spec:
           #mvn package -Dnative $(inputs.params.mavenOpts)
           mvn package
 
+          echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+          ls -l
+
+          echo "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+          ls -l /target
+
+
           mkdir -p /deployments
           #cp target/*-runner.jar /deployments/$(inputs.params.appName).jar
           cp target/$(inputs.params.appName)-$appVersion.jar /deployments/$(inputs.params.appName)-$appVersion.jar
@@ -63,9 +70,7 @@ spec:
       securityContext:
         runAsUser: 0
       workingDir: $(workspaces.shared-workspace.path)
-      outputs:
-        envVars:
-          - name: appVersion
+  
       # env:
       #  - name: MAVEN_OPTS
       #    value: "$(inputs.params.mavenOpts)"
@@ -98,14 +103,14 @@ spec:
         - "$(inputs.params.appName)"
       workingDir: $(workspaces.shared-workspace.path)
 
-    - name: start-build-tag
-      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
-      command: ["oc"]
-      args:
-        - "tag"
-        - "$(inputs.params.appName):latest"
-        - "$(inputs.params.appName):$appVersion"
-      workingDir: $(workspaces.shared-workspace.path)
+    #- name: start-build-tag
+    #  image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+    #  command: ["oc"]
+    #  args:
+    #    - "tag"
+    #    - "$(inputs.params.appName):latest"
+    #    - "$(inputs.params.appName):$appVersion"
+    #  workingDir: $(workspaces.shared-workspace.path)
 
   workspaces:
     - name: shared-workspace

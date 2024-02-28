@@ -68,9 +68,6 @@
               <goal>generate-code-tests</goal>
             </goals>
           </execution>
-          <configuration>
-            <uberJar>true</uberJar>
-          </configuration>
         </executions>
       </plugin>
       <plugin>
