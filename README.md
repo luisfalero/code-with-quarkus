@@ -4,14 +4,6 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
-```shell script
-quarkus create && cd code-with-quarkus
-```
-
-```shell script
-podman run --rm --name code-with-quarkus -p 8080:8080 code-with-quarkus:1.0.0
-```
-
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
@@ -62,3 +54,56 @@ If you want to learn more about building native executables, please consult http
 Easily start your Reactive RESTful Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+
+## Example
+
+```shell script
+quarkus create && cd code-with-quarkus
+```
+
+```shell script
+mvn package -Dnative
+```
+
+```shell script
+podman run --rm --name code-with-quarkus -p 8080:8080 code-with-quarkus:1.0.0
+```
+
+```shell script
+podman login -u rh_ee_lfalero quay.io
+```
+
+```shell script
+podman push code-with-quarkus:1.0.0 quay.io/rh_ee_lfalero/code-with-quarkus:1.0.0
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code-with-quarkus
+  namespace: redhat-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: code-with-quarkus
+  template:
+    metadata:
+      labels:
+        app: code-with-quarkus
+    spec:
+      containers:
+        - name: code-with-quarkus
+          image: quay.io/rh_ee_lfalero/code-with-quarkus:1.0.0
+          ports:
+            - containerPort: 8080
+```
+
+```shell script
+oc expose deployment code-with-quarkus --port 8080
+```
+
+```shell script
+oc create route edge --service code-with-quarkus --port 8080
+```
