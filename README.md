@@ -62,7 +62,7 @@ quarkus create && cd code-with-quarkus
 ```
 
 ```shell script
-mvn package -Dnative
+mvn package -Dnative -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
 ```
 
 ```shell script

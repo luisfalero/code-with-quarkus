@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: quarkus-unit-test
+spec:
+  params:
+    - name: git-url
+      description: "URL del repositorio de git de la aplicación Quarkus"
+      type: string
+    - name: maven-settings
+      description: "Configuración Maven (settings.xml) para acceder a los repositorios remotos"
+      type: string
+      default: ""
+  steps:
+    - name: quarkus-unit-test
+      image: maven:3.8.4-openjdk-17
+      workingDir: /workspace/source
+      env:
+        - name: MAVEN_CONFIG
+          value: /tekton/home/.m2
+      script: |
+        mkdir -p /tekton/home/.m2
+        echo "$(params.maven-settings)" > /tekton/home/.m2/settings.xml
+        mvn -B test
