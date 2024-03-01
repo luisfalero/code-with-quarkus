@@ -72,6 +72,11 @@ podman run --rm --name code-with-quarkus -p 8080:8080 code-with-quarkus:1.0.0
 ```
 
 ```shell script
+podman login -u $(oc whoami) -p $(oc whoami -t) default-route-openshift-image-registry.apps.cluster-h6vq5.dynamic.redhatworkshops.io
+default-route-openshift-image-registry.apps.cluster-h6vq5.dynamic.redhatworkshops.io/redhat-test/code-with-quarkus
+
+podman run --rm --name code-with-quarkus -p 8080:8080 default-route-openshift-image-registry.apps.cluster-h6vq5.dynamic.redhatworkshops.io/redhat-test/code-with-quarkus:2.0.0
+
 podman login -u rh_ee_lfalero quay.io
 ```
 
@@ -100,7 +105,7 @@ spec:
       containers:
         - name: code-with-quarkus
           #image: quay.io/rh_ee_lfalero/code-with-quarkus:1.0.0
-          image: image-registry.openshift-image-registry.svc:5000/redhat-test/code-with-quarkus:latest
+          image: image-registry.openshift-image-registry.svc:5000/redhat-test/code-with-quarkus:2.0.0
           ports:
             - containerPort: 8080
 ```
@@ -124,5 +129,5 @@ spec:
 ```
 
 ```shell script
-oc create route edge --service code-with-quarkus --port 8080
+oc  -n redhat-test create route edge --service code-with-quarkus --port 8080
 ```
