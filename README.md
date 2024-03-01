@@ -66,6 +66,8 @@ mvn package -Dnative -Dquarkus.container-image.build=true -Dquarkus.container-im
 ```
 
 ```shell script
+podman build -f src/main/docker/Dockerfile.multistage -t code-with-quarkus:1.0.0 .
+
 podman run --rm --name code-with-quarkus -p 8080:8080 code-with-quarkus:1.0.0
 ```
 
