@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: unit-tests
+  namespace: redhat-test
+spec:
+  steps:
+    - name: run-unit-tests
+      image: image-registry.openshift-image-registry.svc:5000/openshift/java:openjdk-17-ubi8
+      command: ["mvn"]
+      args: ["test"]
+      workingDir: $(workspaces.shared-workspace.path)
+  workspaces:
+    - name: shared-workspace
