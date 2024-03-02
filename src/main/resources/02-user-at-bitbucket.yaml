@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: user-at-bitbucket
+  namespace: redhat-test
+  annotations:
+    tekton.dev/git-0: bitbucket.org
+type: kubernetes.io/basic-auth
+stringData:
+  .git-credentials: https://lfalero:ATBBQgjjFm77HEZFVYmJEFSdKQD76D61109A@bitbucket.org
+  .gitconfig: >-
+    [credential]
+      helper = store
+    [credential "https://bitbucket.org"]
+      username = "lfalero"
+  password: ATBBQgjjFm77HEZFVYmJEFSdKQD76D61109A
+  username: lfalero
