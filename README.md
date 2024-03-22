@@ -159,3 +159,24 @@ spec:
 ```shell
 oc  -n redhat-test create route edge --service code-with-quarkus --port 8080
 ```
+
+Exportar el archivo application.properties a un **ConfigMap**
+
+```yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: code-with-quarkus-cm
+  namespace: redhat-test
+immutable: false
+data:
+  application.properties: |-
+    redhat.operation-name=example05
+    redhat.operation-namespace=example06
+```
+
+```shell
+oc set volume deployment/code-with-quarkus --add \
+  -t configmap -m /deployments/config \
+  --name config-volume --configmap-name code-with-quarkus-cm
+```
